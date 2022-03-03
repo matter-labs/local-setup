@@ -57,3 +57,13 @@ environment:
 
 - `DATABASE_URL` is the URL to the Postgres database.
 - `ETH_CLIENT_WEB3_URL` is the URL to the HTTP JSON-RPC interface of the L1 node.
+
+## Local testing example
+
+In the [example](./example) folder you can see an example of a project that supports local testing. 
+
+To run tests, go to the `example` folder in the terminal and run:
+
+```
+yarn test
+```
