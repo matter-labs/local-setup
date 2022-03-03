@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { Wallet, Provider, Contract } from 'zksync-web3';
-import { ethers } from 'ethers';
 import * as hre from 'hardhat';
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 
@@ -15,9 +14,6 @@ describe("Greeter", function () {
     it("Should return the new greeting once it's changed", async function () {
         const provider = Provider.getDefaultProvider();
 
-        const ethProvider = ethers.getDefaultProvider('http://localhost:8545');
-        console.log((await ethProvider.getBalance('0x36615Cf349d7F6344891B1e7CA7C72883F5dc049')).toString());
-        return;
         const wallet = new Wallet(RICH_WALLET_PK, provider);
         const deployer = new Deployer(hre, wallet);
 
