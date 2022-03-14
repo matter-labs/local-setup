@@ -60,10 +60,12 @@ environment:
 
 ## Local testing example
 
-In the [example](./example) folder you can see an example of a project that supports local testing. 
+You can an example of hardhat project that utilizes local testing capabilities [here](https://github.com/matter-labs/tutorial-examples/tree/main/local-setup-testing).
 
-To run tests, go to the `example` folder in the terminal and run:
+To run tests, clone the repo and run `yarn test`:
 
 ```
+git clone https://github.com/matter-labs/tutorial-examples.git
+cd local-setup-testing
 yarn test
 ```
