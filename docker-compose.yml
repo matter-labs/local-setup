@@ -33,6 +33,15 @@ services:
     ports:
       - "3050:3050" # JSON RPC HTTP port
       - "3051:3051" # JSON RPC WS port
+    volumes:
+      # Configs folder bind
+      - type: bind
+        source: ./volumes/zksync/env/dev
+        target: /etc/env/dev
+      # Storage folder bind
+      - type: bind
+        source: ./volumes/zksync/data
+        target: /var/lib/zksync/data
     environment:
       - DATABASE_URL=postgres://postgres@postgres/zksync_local
       - ETH_CLIENT_WEB3_URL=http://geth:8545
