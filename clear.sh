@@ -2,3 +2,4 @@
 
 docker-compose down
 rm -rf ./volumes
+docker-compose pull
