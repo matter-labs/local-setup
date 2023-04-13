@@ -36,8 +36,8 @@ services:
     volumes:
       # Configs folder bind
       - type: bind
-        source: ./volumes/zksync/env/dev
-        target: /etc/env/dev
+        source: ./volumes/zksync/env.env
+        target: /etc/env/dev.env
       # Storage folder bind
       - type: bind
         source: ./volumes/zksync/data
