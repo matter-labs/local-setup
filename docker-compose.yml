@@ -8,7 +8,7 @@ services:
       - "8545:8545"
       - "8546:8546"
     volumes:
-      - /var/lib/geth/data
+      - geth:/var/lib/geth/data
   postgres:
     image: "postgres:12"
     logging:
@@ -16,7 +16,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
   zksync:
@@ -31,9 +31,9 @@ services:
       - "3051:3051" # JSON RPC WS port
     volumes:
       # Configs folder bind
-      - /etc/env/
+      - zksync-config:/etc/env/
       # Storage folder bind
-      - /var/lib/zksync/data
+      - zksync-data:/var/lib/zksync/data
     environment:
       - DATABASE_URL=postgres://postgres@postgres/zksync_local
       - ETH_CLIENT_WEB3_URL=http://geth:8545
