@@ -4,14 +4,14 @@ This repository contains the tooling necessary to bootstrap zkSync locally.
 
 ## Dependencies
 
-To run zkSync locally, you must have `docker-compose` and `Docker` installed on your machine. 
+To run zkSync locally, you must have `docker compose` and `Docker` installed on your machine. 
 
 ## Usage
 
-To bootstrap zkSync locally, run the `start.sh` script:
+To bootstrap zkSync locally, just run:
 
 ```
-> ./start.sh
+> docker compose up
 ```
 
 This command will bootstrap three docker containers:
@@ -25,16 +25,18 @@ By default, the HTTP JSON-RPC API will run on port `3050`, while WS API will run
 
 ## Resetting zkSync state
 
-To reset the zkSync state, run the `./clear.sh` script:
+To reset the zkSync state, just run:
 
 ```
-> ./clear.sh
+> docker compose down --volumes
 ```
 
-Note, that you may receive a "permission denied" error when running this command. In this case, you should run it with the root privileges:
+This command will stop and remove all of the pods and named volumes that contains the network state
+
+After this, you can run again:
 
 ```
-> sudo ./clear.sh
+> docker compose up
 ```
 
 ## Rich wallets
