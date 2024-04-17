@@ -2,6 +2,8 @@
 
 This repository contains the tooling necessary to bootstrap zkSync locally.
 
+By default, it doesn't use any docker volumes, so all the data is lost when docker is stopped.
+
 ## Dependencies
 
 To run zkSync locally, you must have `docker compose` and `Docker` installed on your machine. 
@@ -11,12 +13,12 @@ To run zkSync locally, you must have `docker compose` and `Docker` installed on 
 To bootstrap zkSync locally, just run:
 
 ```
-> docker compose up
+> ./start.sh
 ```
 
 This command will bootstrap three docker containers:
 - Postgres (used as the database for zkSync).
-- Local Geth node (used as L1 for zkSync).
+- Local Reth node (used as L1 for zkSync).
 - zkSync server itself.
 
 By default, the HTTP JSON-RPC API will run on port `3050`, while WS API will run on port `3051`. 
@@ -28,16 +30,9 @@ By default, the HTTP JSON-RPC API will run on port `3050`, while WS API will run
 To reset the zkSync state, just run:
 
 ```
-> docker compose down --volumes
+> ./clear.sh
 ```
 
-This command will stop and remove all of the pods and named volumes that contains the network state
-
-After this, you can run again:
-
-```
-> docker compose up
-```
 
 ## Rich wallets
 

@@ -1,43 +1,45 @@
-version: '3.2'
 services:
-  geth:
-    image: "matterlabs/geth:latest"
-    logging:
-        driver: none 
-    ports:
-      - "8545:8545"
-      - "8546:8546"
+  reth:
+    restart: always
+    image: "ghcr.io/paradigmxyz/reth:v0.2.0-beta.2"
     volumes:
-      - geth:/var/lib/geth/data
-  postgres:
-    image: "postgres:12"
-    logging:
-      driver: none 
-    volumes:
-      - postgres:/var/lib/postgresql/data
+      - type: bind
+        source: ./reth_chaindata
+        target: /chaindata
+
+    command: node --dev --datadir /rethdata --http --http.addr 0.0.0.0 --http.port 8545  --dev.block-time 300ms --chain /chaindata/reth_config
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - RUST_LOG=warn
+    ports:
+      - 127.0.0.1:8545:8545
+  postgres:
+    image: "postgres:14"
+    command: postgres -c 'max_connections=200'
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      # We bind only to 127.0.0.1, so setting insecure password is acceptable here
+      - POSTGRES_PASSWORD=notsecurepassword
   zksync:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:latest2.0
+    image: matterlabs/local-node:${INSTANCE_TYPE}
+    healthcheck:
+      test: curl --fail http://localhost:3071/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     depends_on:
-      - geth
+      - reth
       - postgres
     ports:
-      - "3050:3050" # JSON RPC HTTP port
-      - "3051:3051" # JSON RPC WS port
-    volumes:
-      # Configs folder bind
-      - zksync-config:/etc/env/
-      # Storage folder bind
-      - zksync-data:/var/lib/zksync/data
+      - 127.0.0.1:3050:3050 # JSON RPC HTTP port
+      - 127.0.0.1:3051:3051 # JSON RPC WS port
     environment:
-      - DATABASE_URL=postgres://postgres@postgres/zksync_local
-      - ETH_CLIENT_WEB3_URL=http://geth:8545
+      - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_local
+      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_local
+      - ETH_CLIENT_WEB3_URL=http://reth:8545 
 
 volumes:
-  geth:
-  postgres:
-  zksync-config:
-  zksync-data:
+  reth:
