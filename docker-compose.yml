@@ -23,7 +23,7 @@ services:
   zksync:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:${INSTANCE_TYPE}
+    image: matterlabs/local-node:${INSTANCE_TYPE:-latest2.0}
     healthcheck:
       test: curl --fail http://localhost:3071/health || exit 1
       interval: 10s
