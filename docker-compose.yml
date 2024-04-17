@@ -1,4 +1,3 @@
-version: '3.2'
 services:
   reth:
     restart: always
@@ -24,7 +23,7 @@ services:
   zksync:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:mmzk_0416-1
+    image: matterlabs/local-node:${INSTANCE_TYPE}
     healthcheck:
       test: curl --fail http://localhost:3071/health || exit 1
       interval: 10s
@@ -35,8 +34,8 @@ services:
       - reth
       - postgres
     ports:
-      - "3050:3050" # JSON RPC HTTP port
-      - "3051:3051" # JSON RPC WS port
+      - 127.0.0.1:3050:3050 # JSON RPC HTTP port
+      - 127.0.0.1:3051:3051 # JSON RPC WS port
     environment:
       - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_local
       - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_local
