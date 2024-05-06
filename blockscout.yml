@@ -49,29 +49,8 @@ services:
     env_file:
       -  blockscout/common-frontend.env
 
-  stats-db:
-    image: postgres:15
-    shm_size: 256m
-    restart: always
-    command: postgres -c 'max_connections=200'
-    environment:
-        POSTGRES_DB: 'stats'
-        POSTGRES_USER: 'stats'
-        POSTGRES_PASSWORD: 'n0uejXPl61ci6ldCuE2gQU5Y'
-    ports:
-      - target: 5432
-        published: 7433
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U stats -d stats"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-
   stats:
     depends_on:
-      - stats-db
       - backend
     image: ghcr.io/blockscout/stats:${STATS_DOCKER_TAG:-latest}
     platform: linux/amd64
@@ -81,7 +60,7 @@ services:
     env_file:
       -  blockscout/common-stats.env
     environment:
-      - STATS__DB_URL=postgres://stats:n0uejXPl61ci6ldCuE2gQU5Y@stats-db:5432/stats
+      - STATS__DB_URL=postgresql://blockscout:ceWb1MeLBEeOIfk65gU8EjF8@db:5432/stats
       - STATS__BLOCKSCOUT_DB_URL=${STATS__BLOCKSCOUT_DB_URL:-postgresql://blockscout:ceWb1MeLBEeOIfk65gU8EjF8@db:5432/blockscout}
       - STATS__CREATE_DATABASE=true
       - STATS__RUN_MIGRATIONS=true
