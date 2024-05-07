@@ -66,3 +66,26 @@ git clone https://github.com/matter-labs/tutorial-examples.git
 cd local-setup-testing
 yarn test
 ```
+
+
+
+## Hyperchains
+
+Will start a hyperchain with 3 L2s, L1 and necessary explorers.
+
+To run:
+
+```shell
+docker compose -f hyperchain-docker-compose.yml up -d
+```
+
+
+
+### Manual transfer to hyperchains
+
+
+Make sure to get the correct bridgehub address (in this example: 0x35A3783781DE026E1e854A6DA45d7a903664a9dA) from the hyperexplorer.
+
+ ```
+ cast send -r http://localhost:15045  --private-key 0x27593fea79697e947890ecbecce7901b0008345e5d7259710d0dd5e500d040be 0x35A3783781DE026E1e854A6DA45d7a903664a9dA "requestL2TransactionDirect((uint256, uint256, address, uint256, bytes, uint256, uint256, bytes[], address))" "(270,0xde0b6b3a7640000,0x005C43B2063625e9425943Fec65c42d005a2cD1f,10000000000000,"",10000000,800,[0x1234567890123456789012345678901234567890123456789012345678901234],0x005C43B2063625e9425943Fec65c42d005a2cD1f)" --value=1000000000000000000
+ ```
