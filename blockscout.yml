@@ -3,9 +3,8 @@ services:
     image: 'redis:alpine'
     command: redis-server
 
-
   db:
-    image: postgres:15
+    image: postgres:14
     shm_size: 256m
     restart: always
     command: postgres -c 'max_connections=200' -c 'client_connection_check_interval=60000'
@@ -38,7 +37,9 @@ services:
     links:
       - db:database
     environment:
-        ETHEREUM_JSONRPC_VARIANT: 'geth'
+        - ETHEREUM_JSONRPC_VARIANT=geth
+        - DATABASE_URL=postgresql://blockscout:ceWb1MeLBEeOIfk65gU8EjF8@db:5432/blockscout
+
   
   frontend:
     depends_on:
