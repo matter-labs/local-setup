@@ -56,7 +56,7 @@ services:
   zksync:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:mmzk_0506-2
+    image: matterlabs/local-node:hyperlocal
     healthcheck:
       test: curl --fail http://localhost:3071/health || exit 1
       interval: 10s
@@ -81,8 +81,7 @@ services:
   zksync_slave:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:mmzk_0506-2
-    #entrypoint: sleep 1000000
+    image: matterlabs/local-node:hyperlocal
     depends_on:
       - reth
       - postgres
@@ -105,8 +104,7 @@ services:
   zksync_slave2:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:mmzk_0506-2
-    #entrypoint: sleep 1000000
+    image: matterlabs/local-node:hyperlocal
     depends_on:
       - reth
       - postgres
