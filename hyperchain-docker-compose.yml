@@ -22,6 +22,7 @@
 #   So 15100 - 'master', 15200 - 'slave', 15300 - 'slave2'
 
 # Database is on 15432
+# pgAdmin to manage PostgreSQL DB is on 15430
 
 services:
   reth:
@@ -51,6 +52,17 @@ services:
     environment:
       # We bind only to 127.0.0.1, so setting insecure password is acceptable here
       - POSTGRES_PASSWORD=notsecurepassword
+  
+  pgadmin4:
+    image: dcagatay/pwless-pgadmin4:latest
+    ports:
+      - 127.0.0.1:15430:80
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: notsecurepassword
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    restart: unless-stopped
   
   # Master node - that will create the hyperchain
   zksync:
