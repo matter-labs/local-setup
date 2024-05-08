@@ -14,16 +14,16 @@
                             "explorer": "http://localhost:15005/?network=local",
                             "type": "rollup"
                         },
-                        "slave1": {
+                        "custombase": {
                             "chain_id": "0x110",
-                            "l2_url": "http://zksync_slave:3050",
-                            "explorer": "http://localhost:15005/?network=local_slave1",
+                            "l2_url": "http://zksync_custombase:3050",
+                            "explorer": "http://localhost:15005/?network=local_custombase",
                             "type": "rollup"
                         },
-                        "slave2": {
+                        "validium": {
                             "chain_id": "0x111",
-                            "l2_url": "http://zksync_slave2:3050",
-                            "explorer": "http://localhost:15005/?network=local_slave2",
+                            "l2_url": "http://zksync_validium:3050",
+                            "explorer": "http://localhost:15005/?network=local_validium",
                             "type": "rollup"
                         }
                     }

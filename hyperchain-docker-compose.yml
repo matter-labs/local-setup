@@ -2,7 +2,7 @@
 #
 # - L1 (reth) with explorer (blockscout)
 # - a single postgres (with all the databases)
-# - 3 zksync chains (with ids 270, 272, 273) - 'master', 'slave', 'slave2'
+# - 3 zksync chains (with ids 270, 272, 273) - 'master', 'custombase', 'validium'
 # - together with their explorers
 # - hyperexplorer to merge it all together.
 
@@ -19,7 +19,7 @@
 #      - 15101 - ws
 #      - 15102 - explorer api
 #
-#   So 15100 - 'master', 15200 - 'slave', 15300 - 'slave2'
+#   So 15100 - 'master', 15200 - 'custombase', 15300 - 'validium'
 
 # Database is on 15432
 
@@ -56,7 +56,7 @@ services:
   zksync:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:hyperlocal
+    image: matterlabs/local-node:mmzk_0508-1
     healthcheck:
       test: curl --fail http://localhost:3071/health || exit 1
       interval: 10s
@@ -65,6 +65,7 @@ services:
       start_period: 30s
     volumes:
       - shared_config:/etc/env/target
+      - shared_tokens:/etc/tokens
     depends_on:
       - reth
       - postgres
@@ -78,52 +79,58 @@ services:
 
 
 
-  zksync_slave:
+  zksync_custombase:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:hyperlocal
+    image: matterlabs/local-node:mmzk_0508-1
     depends_on:
       - reth
       - postgres
       - zksync
     volumes:
       - shared_config:/etc/master_env
+      - shared_tokens:/etc/tokens:ro
     ports:
       - 127.0.0.1:15200:3050 # JSON RPC HTTP port
       - 127.0.0.1:15201:3051 # JSON RPC WS port
     environment:
-      - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_slave
-      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_slave
+      - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_custombase
+      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_custombase
       - ETH_CLIENT_WEB3_URL=http://reth:8545
       - CHAIN_ETH_ZKSYNC_NETWORK_ID=272
       - IN_DOCKER=true 
       - MASTER_URL=http://zksync:3050
       - MASTER_HEALTH_URL=http://zksync:3071/health
       - MASTER_ENV_FILE=/etc/master_env/dev.env
+      - CUSTOM_BASE_TOKEN=BAT
 
-  zksync_slave2:
+  zksync_validium:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:hyperlocal
+    image: matterlabs/local-node:mmzk_0508-1
+    #entrypoint: sleep 1000000
     depends_on:
       - reth
       - postgres
       - zksync
-      - zksync_slave # daisy chain
+      - zksync_custombase # daisy chain
     volumes:
       - shared_config:/etc/master_env
+      - shared_tokens:/etc/tokens:ro
     ports:
       - 127.0.0.1:15300:3050 # JSON RPC HTTP port
       - 127.0.0.1:15301:3051 # JSON RPC WS port
     environment:
-      - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_slave2
-      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_slave2
+      - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_validium
+      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_validium
       - ETH_CLIENT_WEB3_URL=http://reth:8545
       - CHAIN_ETH_ZKSYNC_NETWORK_ID=273
       - IN_DOCKER=true 
       - MASTER_URL=http://zksync:3050
-      - MASTER_HEALTH_URL=http://zksync_slave:3071/health  ## daisy chain
+      - MASTER_HEALTH_URL=http://zksync_custombase:3071/health  ## daisy chain
       - MASTER_ENV_FILE=/etc/master_env/dev.env
+      - CHAIN_STATE_KEEPER_L1_BATCH_COMMIT_DATA_GENERATOR_MODE=Validium
+      - VALIDIUM_MODE=1
 
 
 
@@ -140,24 +147,24 @@ services:
       - BLOCKCHAIN_RPC_URL=http://zksync:3050
     restart: unless-stopped
 
-  data-fetcher_slave:
+  data-fetcher_custombase:
     platform: linux/amd64
     image: "matterlabs/block-explorer-data-fetcher:latest"
     environment:
       - PORT=3040
       - LOG_LEVEL=verbose
       - NODE_ENV=development
-      - BLOCKCHAIN_RPC_URL=http://zksync_slave:3050
+      - BLOCKCHAIN_RPC_URL=http://zksync_custombase:3050
     restart: unless-stopped
 
-  data-fetcher_slave2:
+  data-fetcher_validium:
     platform: linux/amd64
     image: "matterlabs/block-explorer-data-fetcher:latest"
     environment:
       - PORT=3040
       - LOG_LEVEL=verbose
       - NODE_ENV=development
-      - BLOCKCHAIN_RPC_URL=http://zksync_slave2:3050
+      - BLOCKCHAIN_RPC_URL=http://zksync_validium:3050
     restart: unless-stopped
 
 
@@ -178,7 +185,7 @@ services:
       - BATCHES_PROCESSING_POLLING_INTERVAL=1000
     restart: unless-stopped
 
-  worker_slave:
+  worker_custombase:
     platform: linux/amd64
     image: "matterlabs/block-explorer-worker:latest"
     environment:
@@ -188,14 +195,14 @@ services:
       - DATABASE_HOST=postgres
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=notsecurepassword
-      - DATABASE_NAME=block-explorer_slave
-      - BLOCKCHAIN_RPC_URL=http://zksync_slave:3050
-      - DATA_FETCHER_URL=http://data-fetcher_slave:3040
+      - DATABASE_NAME=block-explorer_custombase
+      - BLOCKCHAIN_RPC_URL=http://zksync_custombase:3050
+      - DATA_FETCHER_URL=http://data-fetcher_custombase:3040
       - BATCHES_PROCESSING_POLLING_INTERVAL=1000
     restart: unless-stopped
 
 
-  worker_slave2:
+  worker_validium:
     platform: linux/amd64
     image: "matterlabs/block-explorer-worker:latest"
     environment:
@@ -205,9 +212,9 @@ services:
       - DATABASE_HOST=postgres
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=notsecurepassword
-      - DATABASE_NAME=block-explorer_slave2
-      - BLOCKCHAIN_RPC_URL=http://zksync_slave2:3050
-      - DATA_FETCHER_URL=http://data-fetcher_slave2:3040
+      - DATABASE_NAME=block-explorer_validium
+      - BLOCKCHAIN_RPC_URL=http://zksync_validium:3050
+      - DATA_FETCHER_URL=http://data-fetcher_validium:3040
       - BATCHES_PROCESSING_POLLING_INTERVAL=1000
     restart: unless-stopped
 
@@ -228,7 +235,7 @@ services:
     restart: unless-stopped
 
 
-  api_slave:
+  api_custombase:
     platform: linux/amd64
     image: "matterlabs/block-explorer-api:latest"
     environment:
@@ -236,15 +243,15 @@ services:
       - METRICS_PORT=3005
       - LOG_LEVEL=verbose
       - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres:5432/block-explorer_slave
+      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres:5432/block-explorer_custombase
     ports:
       - '127.0.0.1:15202:3020'
     depends_on:
-      - worker_slave
+      - worker_custombase
     restart: unless-stopped
 
 
-  api_slave2:
+  api_validium:
     platform: linux/amd64
     image: "matterlabs/block-explorer-api:latest"
     environment:
@@ -252,11 +259,11 @@ services:
       - METRICS_PORT=3005
       - LOG_LEVEL=verbose
       - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres:5432/block-explorer_slave2
+      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres:5432/block-explorer_validium
     ports:
       - '127.0.0.1:15302:3020'
     depends_on:
-      - worker_slave2
+      - worker_validium
     restart: unless-stopped
 
   app:
@@ -270,8 +277,8 @@ services:
       - '127.0.0.1:15005:3010'
     depends_on:
       - api_main
-      - api_slave
-      - api_slave2
+      - api_custombase
+      - api_validium
     restart: unless-stopped
     
 
@@ -363,3 +370,4 @@ services:
 volumes:
   reth:
   shared_config:
+  shared_tokens:

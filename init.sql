@@ -1,3 +1,3 @@
 CREATE DATABASE "block-explorer";
-CREATE DATABASE "block-explorer_slave";
-CREATE DATABASE "block-explorer_slave2";
+CREATE DATABASE "block-explorer_custombase";
+CREATE DATABASE "block-explorer_validium";
