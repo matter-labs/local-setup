@@ -22,6 +22,7 @@
 #   So 15100 - 'master', 15200 - 'custombase', 15300 - 'validium'
 
 # Database is on 15432
+# pgAdmin to manage PostgreSQL DB is on 15430
 
 services:
   reth:
@@ -51,6 +52,17 @@ services:
     environment:
       # We bind only to 127.0.0.1, so setting insecure password is acceptable here
       - POSTGRES_PASSWORD=notsecurepassword
+  
+  pgadmin4:
+    image: dcagatay/pwless-pgadmin4:latest
+    ports:
+      - 127.0.0.1:15430:80
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: notsecurepassword
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    restart: unless-stopped
   
   # Master node - that will create the hyperchain
   zksync:
@@ -108,7 +120,6 @@ services:
     stdin_open: true
     tty: true
     image: matterlabs/local-node:mmzk_0508-1
-    #entrypoint: sleep 1000000
     depends_on:
       - reth
       - postgres
@@ -131,11 +142,6 @@ services:
       - MASTER_ENV_FILE=/etc/master_env/dev.env
       - CHAIN_STATE_KEEPER_L1_BATCH_COMMIT_DATA_GENERATOR_MODE=Validium
       - VALIDIUM_MODE=1
-
-
-
-
-
 
   data-fetcher_main:
     platform: linux/amd64
