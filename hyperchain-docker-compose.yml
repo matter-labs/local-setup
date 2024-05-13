@@ -68,12 +68,12 @@ services:
   zksync:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:mmzk_0508-1
+    image: matterlabs/local-node:hyperlocal
     healthcheck:
       test: curl --fail http://localhost:3071/health || exit 1
       interval: 10s
       timeout: 5s
-      retries: 20
+      retries: 200
       start_period: 30s
     volumes:
       - shared_config:/etc/env/target
@@ -94,11 +94,20 @@ services:
   zksync_custombase:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:mmzk_0508-1
+    image: matterlabs/local-node:hyperlocal
     depends_on:
-      - reth
-      - postgres
-      - zksync
+      reth:
+        condition: service_started
+      postgres:
+        condition: service_started
+      zksync:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:3071/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 200
+      start_period: 30s
     volumes:
       - shared_config:/etc/master_env
       - shared_tokens:/etc/tokens:ro
@@ -119,12 +128,22 @@ services:
   zksync_validium:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:mmzk_0508-1
+    image: matterlabs/local-node:hyperlocal
     depends_on:
-      - reth
-      - postgres
-      - zksync
-      - zksync_custombase # daisy chain
+      reth:
+        condition: service_started
+      postgres:
+        condition: service_started
+      zksync:
+        condition: service_healthy
+      zksync_custombase: # daisy chain
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:3071/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 200
+      start_period: 30s
     volumes:
       - shared_config:/etc/master_env
       - shared_tokens:/etc/tokens:ro
@@ -365,7 +384,10 @@ services:
     depends_on:
       zksync:
         condition: service_healthy
-
+      zksync_validium:
+        condition: service_healthy
+      zksync_custombase:
+        condition: service_healthy
     image: ghcr.io/mm-zk/zksync_tools:latest
     ports:
       - 127.0.0.1:15000:5000
