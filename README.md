@@ -76,9 +76,13 @@ Will start a hyperchain with 3 L2s, L1 and necessary explorers.
 To run:
 
 ```shell
+# to fetch the latest images
+docker compose -f hyperchain-docker-compose.yml pull
+
 docker compose -f hyperchain-docker-compose.yml up -d
 ```
 
+Afterwards, you'll have explorers available at http://localhost:15000 http://localhost:15001 and http://localhost:15005
 
 
 ### Manual transfer to hyperchains

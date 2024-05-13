@@ -7,12 +7,12 @@ const e = [
     {
         apiUrl: "http://localhost:15202", bridgeUrl: "http://localhost:3000/bridge", hostnames: [
             "localhost"
-        ], icon: "/images/icons/zksync-arrows.svg", l2ChainId: 272, l2NetworkName: "Slave", maintenance: !1, name: "local_slave1", published: !0, rpcUrl: "http://localhost:15200"
+        ], icon: "/images/icons/zksync-arrows.svg", l2ChainId: 272, l2NetworkName: "CustomBase", maintenance: !1, name: "local_custombase", published: !0, rpcUrl: "http://localhost:15200"
     },
     {
         apiUrl: "http://localhost:15302", bridgeUrl: "http://localhost:3000/bridge", hostnames: [
             "localhost"
-        ], icon: "/images/icons/zksync-arrows.svg", l2ChainId: 273, l2NetworkName: "Slave2", maintenance: !1, name: "local_slave2", published: !0, rpcUrl: "http://localhost:15300"
+        ], icon: "/images/icons/zksync-arrows.svg", l2ChainId: 273, l2NetworkName: "Validium", maintenance: !1, name: "local_validium", published: !0, rpcUrl: "http://localhost:15300"
     }
 
 ]; var s = {
