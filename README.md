@@ -12,8 +12,8 @@ To run zkSync locally, you must have `docker compose` and `Docker` installed on 
 
 To bootstrap zkSync locally, just run:
 
-```
-> ./start.sh
+```shell
+./start.sh
 ```
 
 This command will bootstrap three docker containers:
@@ -29,8 +29,8 @@ By default, the HTTP JSON-RPC API will run on port `3050`, while WS API will run
 
 To reset the zkSync state, just run:
 
-```
-> ./clear.sh
+```shell
+./clear.sh
 ```
 
 
@@ -61,7 +61,7 @@ You can an example of hardhat project that utilizes local testing capabilities [
 
 To run tests, clone the repo and run `yarn test`:
 
-```
+```shell
 git clone https://github.com/matter-labs/tutorial-examples.git
 cd local-setup-testing
 yarn test
@@ -69,27 +69,24 @@ yarn test
 
 
 
-## Hyperchains
+## ZK Chains
 
-Will start a hyperchain with 3 L2s, L1 and necessary explorers.
+Will start ZK Chains with 3 L2s, L1 and necessary explorers.
 
 To run:
 
 ```shell
-# to fetch the latest images
-docker compose -f hyperchain-docker-compose.yml pull
-
-docker compose -f hyperchain-docker-compose.yml up -d
+./start-zk-chains.sh
 ```
 
 Afterwards, you'll have explorers available at http://localhost:15000 http://localhost:15001 and http://localhost:15005
 
 
-### Manual transfer to hyperchains
+### Manual transfer to ZK Chains
 
 
 Make sure to get the correct bridgehub address (in this example: 0x35A3783781DE026E1e854A6DA45d7a903664a9dA) from the hyperexplorer.
 
- ```
+ ```shell
  cast send -r http://localhost:15045  --private-key 0x27593fea79697e947890ecbecce7901b0008345e5d7259710d0dd5e500d040be 0x35A3783781DE026E1e854A6DA45d7a903664a9dA "requestL2TransactionDirect((uint256, uint256, address, uint256, bytes, uint256, uint256, bytes[], address))" "(270,0xde0b6b3a7640000,0x005C43B2063625e9425943Fec65c42d005a2cD1f,10000000000000,"",10000000,800,[0x1234567890123456789012345678901234567890123456789012345678901234],0x005C43B2063625e9425943Fec65c42d005a2cD1f)" --value=1000000000000000000
  ```
