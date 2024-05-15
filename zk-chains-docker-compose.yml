@@ -1,4 +1,4 @@
-# This docker compose is setting up the full hyperchain network, consisting of:
+# This docker compose is setting up the full ZK Chains network, consisting of:
 #
 # - L1 (reth) with explorer (blockscout)
 # - a single postgres (with all the databases)
@@ -64,7 +64,7 @@ services:
       POSTGRES_PORT: 5432
     restart: unless-stopped
   
-  # Master node - that will create the hyperchain
+  # Master node - that will create the ZK Chain
   zksync:
     stdin_open: true
     tty: true
