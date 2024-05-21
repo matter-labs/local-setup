@@ -87,7 +87,8 @@ services:
     environment:
       - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_local
       - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_local
-      - ETH_CLIENT_WEB3_URL=http://reth:8545 
+      - ETH_CLIENT_WEB3_URL=http://reth:8545
+      - LEGACY_BRIDGE_TESTING=1
 
 
 
