@@ -28,7 +28,7 @@ services:
       test: curl --fail http://localhost:3071/health || exit 1
       interval: 10s
       timeout: 5s
-      retries: 20
+      retries: 200
       start_period: 30s
     depends_on:
       - reth
