@@ -34,7 +34,7 @@ fi
 echo "✅ CUSTOM_TOKEN_ADDRESS=$CUSTOM_TOKEN_ADDRESS"
 
 # ✅ Write to .env for docker-compose
-echo "CUSTOM_BASE_TOKEN=$CUSTOM_TOKEN_ADDRESS" > .env
+echo "CUSTOM_TOKEN_ADDRESS=$CUSTOM_TOKEN_ADDRESS" > .env
 
 # ✅ Restart zksync_custombase with the correct value
 docker compose -f zk-chains-docker-compose.yml up -d zksync_custombase
