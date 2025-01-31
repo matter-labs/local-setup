@@ -1,27 +1,60 @@
 #!/usr/bin/env bash
 
-# usage: ./start-zk-chains.sh INSTANCE_TYPE 
-# Instance type is specifying the docker image to take:
-# see https://hub.docker.com/r/matterlabs/local-node/tags for full list.
-# latest2.0 - is the 'main' one.
+set -e
 
+# usage: ./start-network.sh INSTANCE_TYPE
+# Instance type specifies the docker image to take.
 INSTANCE_TYPE=${1:-latest2.0}
 export INSTANCE_TYPE=$INSTANCE_TYPE
 
-# Fetch the latest images
+# Fetch the latest images and start all services
 docker compose -f zk-chains-docker-compose.yml pull
+docker compose -f zk-chains-docker-compose.yml up -d zksync
+
+echo "Waiting for zkSync master node to be ready..."
+until curl --fail http://localhost:15102/health; do
+  echo "zkSync not ready yet, sleeping..."
+  sleep 10
+done
+
+echo "zkSync is ready. Waiting for token deployment..."
+until docker exec local-setup-zksync-1 test -f /configs/erc20.yaml; do
+  echo "Token config file not found yet, checking again in 5 seconds..."
+  sleep 5
+done
+
+echo "Extracting deployed token address from inside zksync container..."
+CUSTOM_TOKEN_ADDRESS=$(docker exec local-setup-zksync-1 awk -F": " '/tokens:/ {found_tokens=1} found_tokens && /DAI:/ {found_dai=1} found_dai && /address:/ {print $2; exit}' /configs/erc20.yaml)
+
+if [ -z "$CUSTOM_TOKEN_ADDRESS" ]; then
+  echo "❌ Error: Could not retrieve token address. Exiting."
+  exit 1
+fi
+
+echo "✅ CUSTOM_TOKEN_ADDRESS=$CUSTOM_TOKEN_ADDRESS"
+
+# ✅ Write to .env for docker-compose
+echo "CUSTOM_BASE_TOKEN=$CUSTOM_TOKEN_ADDRESS" > .env
+
+# ✅ Restart zksync_custombase with the correct value
+docker compose -f zk-chains-docker-compose.yml up -d zksync_custombase
+
+echo "✅ zksync_custombase started with CUSTOM_BASE_TOKEN=$CUSTOM_TOKEN_ADDRESS"
+
+# Ensure all services are running
+echo "Starting all services..."
 docker compose -f zk-chains-docker-compose.yml up -d
 
+# Function to check if all services are healthy
 check_all_services_healthy() {
-  service="zksync"
-  (docker compose ps $service | grep "(healthy)")
-  if [ $? -eq 0 ]; then
-    return 0
-  else
-    return 1  # If any service is not healthy, return 1
-  fi
+  services=("zksync" "zksync_custombase")
+  for service in "${services[@]}"; do
+    if ! docker compose ps "$service" | grep -q "(healthy)"; then
+      return 1
+    fi
+  done
+  return 0
 }
-
 
 # Loop until all services are healthy
 while ! check_all_services_healthy; do
