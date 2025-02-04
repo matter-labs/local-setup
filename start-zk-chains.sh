@@ -49,7 +49,7 @@ docker compose -f zk-chains-docker-compose.yml up -d
 check_all_services_healthy() {
   services=("zksync" "zksync_custombase")
   for service in "${services[@]}"; do
-    if ! docker compose ps "$service" | grep -q "(healthy)"; then
+    if ! docker compose -f zk-chains-docker-compose.yml ps "$service" | grep -q "(healthy)"; then
       return 1
     fi
   done
