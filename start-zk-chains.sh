@@ -24,7 +24,7 @@ until docker exec local-setup-zksync-1 test -f /configs/erc20.yaml; do
 done
 
 echo "Extracting deployed token address from inside zksync container..."
-CUSTOM_TOKEN_ADDRESS=$(docker exec local-setup-zksync-1 awk -F": " '/tokens:/ {found_tokens=1} found_tokens && /DAI:/ {found_dai=1} found_dai && /address:/ {print $2; exit}' /configs/erc20.yaml)
+CUSTOM_TOKEN_ADDRESS=$(docker exec local-setup-zksync-1 awk -F": " '/tokens:/ {found_tokens=1} found_tokens && /WBTC:/ {found_dai=1} found_dai && /address:/ {print $2; exit}' /configs/erc20.yaml)
 
 if [ -z "$CUSTOM_TOKEN_ADDRESS" ]; then
   echo "❌ Error: Could not retrieve token address. Exiting."

@@ -107,7 +107,7 @@ services:
       zksync:
         condition: service_healthy
     healthcheck:
-      test: curl --fail http://localhost:3071/health || exit 1
+      test: curl --fail http://localhost:3171/health || exit 1
       interval: 10s
       timeout: 5s
       retries: 200
@@ -117,13 +117,13 @@ services:
       - shared_tokens:/etc/tokens:ro
       - shared_configs:/configs  # ✅ Mount /configs from zksync (era) into zksync_custombase
     ports:
-      - 127.0.0.1:15200:3050 # JSON RPC HTTP port
-      - 127.0.0.1:15201:3051 # JSON RPC WS port
+      - 127.0.0.1:15200:3150 # JSON RPC HTTP port
+      - 127.0.0.1:15201:3151 # JSON RPC WS port
     environment:
       - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_custombase
       - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_custombase
       - ETH_CLIENT_WEB3_URL=http://reth:8545
-      - CHAIN_ETH_ZKSYNC_NETWORK_ID=272
+      - CHAIN_ETH_ZKSYNC_NETWORK_ID=277
       - IN_DOCKER=true 
       - MASTER_URL=http://zksync:3050
       - MASTER_HEALTH_URL=http://zksync:3071/health
@@ -391,8 +391,8 @@ services:
         condition: service_healthy
       # zksync_validium:
       #   condition: service_healthy
-      # zksync_custombase:
-      #   condition: service_healthy
+      zksync_custombase:
+        condition: service_healthy
     image: ghcr.io/mm-zk/zksync_tools:latest
     ports:
       - 127.0.0.1:15000:5000
