@@ -249,36 +249,36 @@ services:
   #   restart: unless-stopped
 
 
-  api_main:
-    platform: linux/amd64
-    image: "matterlabs/block-explorer-api:latest"
-    environment:
-      - PORT=3020
-      - METRICS_PORT=3005
-      - LOG_LEVEL=verbose
-      - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres:5432/block-explorer
-    ports:
-      - '127.0.0.1:15103:3020'
-    depends_on:
-      - worker_main
-    restart: unless-stopped
+  # api_main:
+  #   platform: linux/amd64
+  #   image: "matterlabs/block-explorer-api:latest"
+  #   environment:
+  #     - PORT=3020
+  #     - METRICS_PORT=3005
+  #     - LOG_LEVEL=verbose
+  #     - NODE_ENV=development
+  #     - DATABASE_URL=postgres://postgres:notsecurepassword@postgres:5432/block-explorer
+  #   ports:
+  #     - '127.0.0.1:15103:3020'
+  #   depends_on:
+  #     - worker_main
+  #   restart: unless-stopped
 
 
-  api_custombase:
-    platform: linux/amd64
-    image: "matterlabs/block-explorer-api:latest"
-    environment:
-      - PORT=3020
-      - METRICS_PORT=3005
-      - LOG_LEVEL=verbose
-      - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:notsecurepassword@postgres:5432/block-explorer_custombase
-    ports:
-      - '127.0.0.1:15202:3020'
-    depends_on:
-      - worker_custombase
-    restart: unless-stopped
+  # api_custombase:
+  #   platform: linux/amd64
+  #   image: "matterlabs/block-explorer-api:latest"
+  #   environment:
+  #     - PORT=3020
+  #     - METRICS_PORT=3005
+  #     - LOG_LEVEL=verbose
+  #     - NODE_ENV=development
+  #     - DATABASE_URL=postgres://postgres:notsecurepassword@postgres:5432/block-explorer_custombase
+  #   ports:
+  #     - '127.0.0.1:15202:3020'
+  #   depends_on:
+  #     - worker_custombase
+  #   restart: unless-stopped
 
 
   # api_validium:
@@ -305,8 +305,8 @@ services:
 
     ports:
       - '127.0.0.1:15005:3010'
-    depends_on:
-      - api_main
+    # depends_on:
+      # - api_main
       # - api_custombase
       # - api_validium
     restart: unless-stopped
