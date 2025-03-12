@@ -39,9 +39,6 @@ echo "CUSTOM_TOKEN_ADDRESS=$CUSTOM_TOKEN_ADDRESS" > .env
 # ✅ Restart zksync_custombase with the correct value
 docker compose -f zk-chains-docker-compose.yml up -d zksync_custombase
 
-# ✅ Continuously stream logs to debug startup issues
-docker compose -f zk-chains-docker-compose.yml logs -f zksync_custombase
-
 echo "✅ zksync_custombase started with CUSTOM_BASE_TOKEN=$CUSTOM_TOKEN_ADDRESS"
 
 # Ensure all services are running
@@ -51,18 +48,21 @@ docker compose -f zk-chains-docker-compose.yml up -d
 # Function to check if all services are healthy
 check_all_services_healthy() {
   services=("zksync" "zksync_custombase")
+  all_healthy=true
   for service in "${services[@]}"; do
-    if ! docker compose -f zk-chains-docker-compose.yml ps "$service" | grep -q "(healthy)"; then
-      return 1
+    status=$(docker compose -f zk-chains-docker-compose.yml ps --format json | jq -r '.[] | select(.Service=="'$service'") | .Health')
+    echo "Service: $service, Health status: $status"
+    if [[ "$status" != "healthy" ]]; then
+      all_healthy=false
     fi
   done
-  return 0
+  $all_healthy && return 0 || return 1
 }
 
 # Loop until all services are healthy
-while ! check_all_services_healthy; do
+until check_all_services_healthy; do
   echo "Services are not yet healthy, waiting..."
-  sleep 10  # Check every 10 seconds
+  sleep 10
 done
 
 GREEN='\033[0;32m'
