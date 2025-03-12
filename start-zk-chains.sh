@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 # usage: ./start-network.sh INSTANCE_TYPE
 # Instance type specifies the docker image to take.
 INSTANCE_TYPE=${1:-latest2.0}
@@ -52,14 +50,23 @@ check_all_services_healthy() {
   for service in "${services[@]}"; do
     status=$(docker compose -f zk-chains-docker-compose.yml ps --format json | jq -r '.[] | select(.Service=="'$service'") | .Health')
     echo "Service: $service, Health status: $status"
+
     if [[ "$status" != "healthy" ]]; then
       all_healthy=false
+
+      # If a container exited, print logs
+      container_status=$(docker compose -f zk-chains-docker-compose.yml ps --format json | jq -r '.[] | select(.Service=="'$service'") | .State')
+      if [[ "$container_status" == "exited" ]]; then
+        echo "❌ Service $service exited unexpectedly. Logs:"
+        docker compose -f zk-chains-docker-compose.yml logs "$service"
+        exit 1
+      fi
     fi
   done
   $all_healthy && return 0 || return 1
 }
 
-# Loop until all services are healthy
+# Loop until all services are healthy or a failure is detected
 until check_all_services_healthy; do
   echo "Services are not yet healthy, waiting..."
   sleep 10
