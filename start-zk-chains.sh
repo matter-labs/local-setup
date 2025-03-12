@@ -39,6 +39,9 @@ echo "CUSTOM_TOKEN_ADDRESS=$CUSTOM_TOKEN_ADDRESS" > .env
 # ✅ Restart zksync_custombase with the correct value
 docker compose -f zk-chains-docker-compose.yml up -d zksync_custombase
 
+# ✅ Continuously stream logs to debug startup issues
+docker compose -f zk-chains-docker-compose.yml logs -f zksync_custombase
+
 echo "✅ zksync_custombase started with CUSTOM_BASE_TOKEN=$CUSTOM_TOKEN_ADDRESS"
 
 # Ensure all services are running
