@@ -58,6 +58,8 @@ check_all_services_healthy() {
     if ! docker compose -f zk-chains-docker-compose.yml ps "$service" | grep -q "(healthy)"; then
       all_healthy=false
       echo "❌ Service $service is NOT healthy! Fetching logs ..."
+      docker logs local-setup-zksync_custombase-1 | head -n 300
+
       docker compose -f zk-chains-docker-compose.yml logs "$service"
 
       # Check if container has exited
