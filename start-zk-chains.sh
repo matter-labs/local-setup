@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 # usage: ./start-network.sh INSTANCE_TYPE
-# Instance type specifies the docker image to take.
+# Instance type is specifying the docker image to take:
+# see https://hub.docker.com/r/matterlabs/local-node/tags for full list.
+# latest2.0 - is the 'main' one.
+
 INSTANCE_TYPE=${1:-latest2.0}
 export INSTANCE_TYPE=$INSTANCE_TYPE
 
@@ -58,7 +61,6 @@ check_all_services_healthy() {
     if ! docker compose -f zk-chains-docker-compose.yml ps "$service" | grep -q "(healthy)"; then
       all_healthy=false
       echo "❌ Service $service is NOT healthy! Fetching logs ..."
-      docker logs local-setup-zksync_custombase-1 | head -n 300
 
       docker compose -f zk-chains-docker-compose.yml logs "$service"
 
@@ -92,7 +94,6 @@ echo -e "SUCCESS, Your local ZK Chains are now running! Find the information bel
 echo -e ""
 echo -e "-> ZK Chain1 (Master) is a normal zkSync Node"
 echo -e "-> ZK Chain2 (CustomBase) is a ZK Chain with a custom base token (BAT)"
-echo -e "-> ZK Chain3 (Validium) is a ZK Chain running in Validium mode"
 echo -e ""
 echo -e "┌──────────────────────────┬────────────────────────┬──────────────────────────────────────────────────┐"
 echo -e "│         Service          │          URL           │                   Description                    │"
@@ -107,9 +108,6 @@ echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}http://localho
 echo -e "│ ${ORANGE}ZK Chain2                ${GREEN}│ ${BLUE}http://localhost:15200${GREEN} │ ${DARKGRAY}HTTP Endpoint for L2 ZK Chain2                   ${GREEN}│"
 echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}ws://localhost:15201${GREEN}   │ ${DARKGRAY}Websocket Endpoint for L2 ZK Chain2              ${GREEN}│"
 echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}http://localhost:15202${GREEN} │ ${DARKGRAY}ZK Chain2 Explorer API                           ${GREEN}│"
-echo -e "│ ${ORANGE}ZK Chain3                ${GREEN}│ ${BLUE}http://localhost:15300${GREEN} │ ${DARKGRAY}Endpoints for L2 ZK Chain3                       ${GREEN}│"
-echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}ws://localhost:15301${GREEN}   │ ${DARKGRAY}Websocket Endpoint for L2 ZK Chain3              ${GREEN}│"
-echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}http://localhost:15302${GREEN} │ ${DARKGRAY}ZK Chain3 Explorer API                           ${GREEN}│"
 echo -e "│ ${ORANGE}pgAdmin                  ${GREEN}│ ${BLUE}http://localhost:15430${GREEN} │ ${DARKGRAY}UI to manage the PostgreSQL databases            ${GREEN}│"
 echo -e "│ ${ORANGE}PostgreSQL DB Server     ${GREEN}│ ${BLUE}http://localhost:15432${GREEN} │ ${DARKGRAY}Database server for all services running locally ${GREEN}│"
 echo -e "└──────────────────────────┴────────────────────────┴──────────────────────────────────────────────────┘"
