@@ -111,7 +111,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 200
-      start_period: 30s
+      start_period: 300s
     volumes:
       - shared_config:/etc/master_env
       - shared_tokens:/etc/tokens:ro
