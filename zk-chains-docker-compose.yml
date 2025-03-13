@@ -2,7 +2,7 @@
 #
 # - L1 (reth) with explorer (blockscout)
 # - a single postgres (with all the databases)
-# - 2 zksync chains (with ids 272, 277) - 'master', 'custombase'
+# - 2 zksync chains (with ids 271, 275) - 'master', 'custombase'
 # - together with their explorers
 # - hyperexplorer to merge it all together.
 
@@ -121,7 +121,7 @@ services:
       - DATABASE_PROVER_URL=postgres://postgres:notsecurepassword@postgres/prover_custombase
       - DATABASE_URL=postgres://postgres:notsecurepassword@postgres/zksync_custombase
       - ETH_CLIENT_WEB3_URL=http://reth:8545
-      - CHAIN_ETH_ZKSYNC_NETWORK_ID=277
+      - CHAIN_ETH_ZKSYNC_NETWORK_ID=271
       - IN_DOCKER=true 
       - MASTER_URL=http://zksync:3050
       - MASTER_HEALTH_URL=http://zksync:3071/health
