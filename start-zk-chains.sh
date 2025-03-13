@@ -47,22 +47,29 @@ docker compose -f zk-chains-docker-compose.yml up -d
 check_all_services_healthy() {
   services=("zksync" "zksync_custombase")
   all_healthy=true
+
   for service in "${services[@]}"; do
-    status=$(docker compose -f zk-chains-docker-compose.yml ps --format json | jq -r '.[] | select(.Service=="'$service'") | .Health')
-    echo "Service: $service, Health status: $status"
+    echo "Checking service: $service"
+    
+    # Print current service status for debugging
+    docker compose -f zk-chains-docker-compose.yml ps "$service"
 
-    if [[ "$status" != "healthy" ]]; then
+    # Check if service is healthy
+    if ! docker compose -f zk-chains-docker-compose.yml ps "$service" | grep -q "(healthy)"; then
       all_healthy=false
+      echo "❌ Service $service is NOT healthy!"
 
-      # If a container exited, print logs
-      container_status=$(docker compose -f zk-chains-docker-compose.yml ps --format json | jq -r '.[] | select(.Service=="'$service'") | .State')
-      if [[ "$container_status" == "exited" ]]; then
-        echo "❌ Service $service exited unexpectedly. Logs:"
+      # Check if container has exited
+      if docker compose -f zk-chains-docker-compose.yml ps "$service" | grep -q "Exit"; then
+        echo "🚨 Service $service has exited unexpectedly. Fetching logs..."
         docker compose -f zk-chains-docker-compose.yml logs "$service"
-        exit 1
+        exit 1  # Stop execution if a service fails
       fi
+    else
+      echo "✅ Service $service is healthy."
     fi
   done
+
   $all_healthy && return 0 || return 1
 }
 
