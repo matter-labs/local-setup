@@ -247,11 +247,12 @@ services:
     links:
       - postgres:database
     environment:
-        - ETHEREUM_JSONRPC_VARIANT=geth
-        - DATABASE_URL=postgresql://postgres:notsecurepassword@postgres:5432/blockscout
-        - ETHEREUM_JSONRPC_HTTP_URL=http://reth:8545
-        - ETHEREUM_JSONRPC_TRACE_URL=http://reth:8545
-
+      - ETHEREUM_JSONRPC_VARIANT=geth
+      - DATABASE_URL=postgresql://postgres:notsecurepassword@postgres:5432/blockscout
+      - ETHEREUM_JSONRPC_HTTP_URL=http://reth:8545
+      - ETHEREUM_JSONRPC_TRACE_URL=http://reth:8545
+    ports:
+      - "127.0.0.1:4000:4000"
   
   frontend:
     depends_on:
@@ -272,6 +273,7 @@ services:
     env_file:
       -  blockscout/common-stats.env
     environment:
+      - STATS__BLOCKSCOUT_API_URL=http://backend:4000
       - STATS__DB_URL=postgresql://postgres:notsecurepassword@postgres:5432/blockscout_stats
       - STATS__BLOCKSCOUT_DB_URL=postgresql://postgres:notsecurepassword@postgres:5432/blockscout
       - STATS__CREATE_DATABASE=true

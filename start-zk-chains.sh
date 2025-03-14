@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# usage: ./start-network.sh INSTANCE_TYPE
+# usage: ./start-zk-chains.sh INSTANCE_TYPE
 # Instance type is specifying the docker image to take:
 # see https://hub.docker.com/r/matterlabs/local-node/tags for full list.
 # latest2.0 - is the 'main' one.
