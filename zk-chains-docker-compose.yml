@@ -222,8 +222,7 @@ services:
       - '127.0.0.1:15005:3010'
     depends_on:
       - api_main
-      # - api_custombase
-      # - api_validium
+      - api_custombase
     restart: unless-stopped
     
 
