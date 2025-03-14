@@ -69,7 +69,7 @@ services:
   zksync:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:latest2.0_gateway
+    image: matterlabs/local-node:latest2.0_gateway_test
     healthcheck:
       test: curl --fail http://localhost:3071/health || exit 1
       interval: 10s
@@ -96,7 +96,7 @@ services:
   zksync_custombase:
     stdin_open: true
     tty: true
-    image: matterlabs/local-node:latest2.0_gateway
+    image: matterlabs/local-node:latest2.0_gateway_test
     depends_on:
       reth:
         condition: service_started
