@@ -5,15 +5,22 @@
 # see https://hub.docker.com/r/matterlabs/local-node/tags for full list.
 # latest2.0 - is the 'main' one.
 
+# Usage: ./start-zk-chains.sh INSTANCE_TYPE
 INSTANCE_TYPE=${1:-latest2.0}
 export INSTANCE_TYPE=$INSTANCE_TYPE
+
+# Set default GATEWAY value to false if not provided
+GATEWAY=${GATEWAY:-false}
+
+# Clean shared volumes
+docker compose -f zk-chains-docker-compose.yml down -v
 
 # Fetch the latest images and start all services
 docker compose -f zk-chains-docker-compose.yml pull
 docker compose -f zk-chains-docker-compose.yml up -d zksync
 
 echo "Waiting for zkSync master node to be ready..."
-until curl --fail http://localhost:15102/health; do
+until curl --fail http://localhost:15103/health; do
   echo "zkSync not ready yet, sleeping..."
   sleep 10
 done
@@ -36,6 +43,14 @@ echo "✅ CUSTOM_TOKEN_ADDRESS=$CUSTOM_TOKEN_ADDRESS"
 
 # ✅ Write to .env for docker-compose
 echo "CUSTOM_TOKEN_ADDRESS=$CUSTOM_TOKEN_ADDRESS" > .env
+echo "GATEWAY=$GATEWAY" >> .env
+
+if [[ "$GATEWAY" = "true" ]]; then
+  CUSTOM_BASE_HEALTHCHECK_PORT=3271
+else
+  CUSTOM_BASE_HEALTHCHECK_PORT=3171
+fi
+echo "CUSTOM_BASE_HEALTHCHECK_PORT=$CUSTOM_BASE_HEALTHCHECK_PORT" >> .env
 
 # ✅ Restart zksync_custombase with the correct value
 docker compose -f zk-chains-docker-compose.yml up -d zksync_custombase
@@ -44,7 +59,12 @@ echo "✅ zksync_custombase started with CUSTOM_BASE_TOKEN=$CUSTOM_TOKEN_ADDRESS
 
 # Ensure all services are running
 echo "Starting all services..."
-docker compose -f zk-chains-docker-compose.yml up -d
+
+if [[ "$GATEWAY" = "true" ]]; then
+  docker compose -f zk-chains-docker-compose.yml --profile gateway up -d
+else
+  docker compose -f zk-chains-docker-compose.yml up -d
+fi
 
 # Function to check if all services are healthy
 check_all_services_healthy() {
@@ -62,7 +82,7 @@ check_all_services_healthy() {
       all_healthy=false
       echo "❌ Service $service is NOT healthy! Fetching logs ..."
 
-      docker compose -f zk-chains-docker-compose.yml logs "$service"
+      # docker compose -f zk-chains-docker-compose.yml logs "$service"
 
       # Check if container has exited
       if docker compose -f zk-chains-docker-compose.yml ps "$service" | grep -q "Exit"; then
@@ -108,6 +128,11 @@ echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}http://localho
 echo -e "│ ${ORANGE}ZK Chain2                ${GREEN}│ ${BLUE}http://localhost:15200${GREEN} │ ${DARKGRAY}HTTP Endpoint for L2 ZK Chain2                   ${GREEN}│"
 echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}ws://localhost:15201${GREEN}   │ ${DARKGRAY}Websocket Endpoint for L2 ZK Chain2              ${GREEN}│"
 echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}http://localhost:15202${GREEN} │ ${DARKGRAY}ZK Chain2 Explorer API                           ${GREEN}│"
+if [[ "$GATEWAY" = "true" ]]; then
+  echo -e "│ ${ORANGE}ZK Chain3                ${GREEN}│ ${BLUE}http://localhost:15300${GREEN} │ ${DARKGRAY}HTTP Endpoint for Gateway Chain                  ${GREEN}│"
+  echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}ws://localhost:15301${GREEN}   │ ${DARKGRAY}Websocket Endpoint for Gateway Chain             ${GREEN}│"
+  echo -e "│ ${ORANGE}                         ${GREEN}│ ${BLUE}http://localhost:15302${GREEN} │ ${DARKGRAY}Gateway Explorer API                             ${GREEN}│"
+fi
 echo -e "│ ${ORANGE}pgAdmin                  ${GREEN}│ ${BLUE}http://localhost:15430${GREEN} │ ${DARKGRAY}UI to manage the PostgreSQL databases            ${GREEN}│"
 echo -e "│ ${ORANGE}PostgreSQL DB Server     ${GREEN}│ ${BLUE}http://localhost:15432${GREEN} │ ${DARKGRAY}Database server for all services running locally ${GREEN}│"
 echo -e "└──────────────────────────┴────────────────────────┴──────────────────────────────────────────────────┘"

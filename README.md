@@ -71,9 +71,15 @@ yarn test
 
 ## ZK Chains
 
-Will start ZK Chains with 3 L2s, L1 and necessary explorers.
+Will start 2 ZK Chains with ETH and custom-base token, L1 and necessary explorers.
 
-To run:
+To start Gateway chain and migrate ZK chains on top of it, please pass the parameter as in the example below:
+
+```shell
+GATEWAY=true ./start-zk-chains.sh
+```
+
+Otherwise, to run chains without Gateway run the following command:
 
 ```shell
 ./start-zk-chains.sh
