@@ -3,6 +3,8 @@
 # - L1 (reth) with explorer (blockscout)
 # - a single postgres (with all the databases)
 # - 2 zksync chains (with ids 271, 272) - 'master', 'custombase'
+# - or
+# - 3 zksync chains (with ids 271, 505, 273) - 'master', 'gateway', 'custombase'
 # - together with their explorers
 # - hyperexplorer to merge it all together.
 
